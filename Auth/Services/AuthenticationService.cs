@@ -1,7 +1,9 @@
-﻿using Auth.Core.Security.Hashing;
+﻿using Auth.Core.Models;
+using Auth.Core.Security.Hashing;
 using Auth.Core.Security.Tokens;
 using Auth.Core.Services;
 using Auth.Core.Services.Communication;
+using Microsoft.AspNetCore.Identity;
 using System.Diagnostics;
 
 namespace Auth.Services
@@ -9,10 +11,10 @@ namespace Auth.Services
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IUserService _userService;
-        private readonly IPasswordHasher _passwordHasher;
+        private readonly IPasswordHasher<User> _passwordHasher;
         private readonly ITokenHandler _tokenHandler;
 
-        public AuthenticationService(IUserService userService, IPasswordHasher passwordHasher, ITokenHandler tokenHandler)
+        public AuthenticationService(IUserService userService, IPasswordHasher<User> passwordHasher, ITokenHandler tokenHandler)
         {
             _userService = userService;
             _passwordHasher = passwordHasher;
@@ -23,7 +25,7 @@ namespace Auth.Services
         {
             var user = await _userService.FindByEmailAsync(email);
 
-            if (user == null || _passwordHasher.PasswordMatches(password, user.Password))
+            if (user == null || _userService.ValidatePassword(user, password))
             {
                 return new TokenResponse(false, "Invalid credentials", null);
             }

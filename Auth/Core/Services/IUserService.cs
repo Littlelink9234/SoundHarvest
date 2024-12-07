@@ -7,5 +7,6 @@ namespace Auth.Core.Services
     {
         Task<CreateUserResponse> CreateUserAsync(User user, params ApplicationRole[] userRoles);
         Task<User> FindByEmailAsync(string email);
+        bool ValidatePassword(User user, string password);
     }
 }

@@ -8,22 +8,23 @@ using Microsoft.AspNetCore.Mvc;
 namespace Auth.Controllers
 {
     [ApiController]
-    public class LoginController : Controller
+    [Route("api/[controller]")]
+    public class AuthController : Controller
     {
         private readonly IMapper _mapper;
         private readonly IAuthenticationService _authenticationService;
 
-        public LoginController(IMapper mapper, IAuthenticationService authenticationService)
+        public AuthController(IMapper mapper, IAuthenticationService authenticationService)
         {
             _mapper = mapper;
             _authenticationService = authenticationService;
         }
 
-        [Route("api/login")]
         [HttpPost]
+        [Route("login")]
         public async Task<IActionResult> LoginAsync([FromBody] UserCredentialResource userCredentials)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -35,8 +36,16 @@ namespace Auth.Controllers
                 return BadRequest(response.Message);
             }
 
-            var accessTokenResource = _mapper.Map<AccessToken, AccessTokenResponse>(response.Token);
+            var accessTokenResource = _mapper.Map<AccessToken, AccessTokenResource>(response.Token);
             return Ok(accessTokenResource);
+        }
+
+        [HttpGet]
+        [Route("healthy")]
+        public async Task<IActionResult> CheckHealthStatus()
+        {
+            await Task.CompletedTask;
+            return Ok("Healthy");
         }
     }
 }

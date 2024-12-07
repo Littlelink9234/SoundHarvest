@@ -2,7 +2,7 @@
 {
     public enum ApplicationRole
     {
-        Common = 1,
+        User = 1,
         Administrator = 2
     }
 }

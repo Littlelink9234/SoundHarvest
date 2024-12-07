@@ -1,4 +1,5 @@
 ﻿using Auth.Core.Security.Hashing;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace Auth.Security.Hashing
@@ -24,7 +25,13 @@ namespace Auth.Security.Hashing
 
         public bool PasswordMatches(string providedPassword, string passwordHash)
         {
-            throw new NotImplementedException();
+            using (var hmac = new HMACSHA512())
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(providedPassword));
+                var passwordHashBytes = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(passwordHash));
+
+                return computedHash.SequenceEqual(passwordHashBytes);
+            }
         }
     }
 }
